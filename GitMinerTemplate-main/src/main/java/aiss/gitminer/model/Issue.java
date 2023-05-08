@@ -59,7 +59,9 @@ public class Issue {
     @JoinColumn(name = "issueId")
     private List<Comment> comments;
 
-    public Issue(String id, String refId, String title, String description, String state, String createdAt, String updatedAt, String closedAt, List<String> labels, User author, User assignee, Integer upvotes, Integer downvotes, String webUrl, List<Comment> comments) {
+    public Issue(String id, String refId, String title, String description, String state, String createdAt,
+                 String updatedAt, String closedAt, List<String> labels, User author, User assignee,
+                 Integer upvotes, Integer downvotes, String webUrl, List<Comment> comments) {
         this.id = id;
         this.refId = refId;
         this.title = title;

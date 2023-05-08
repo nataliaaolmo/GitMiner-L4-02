@@ -1,58 +1,169 @@
 package aiss.gitminer.controller;
 
+import aiss.gitminer.Exception.ProjectNotFoundException;
 import aiss.gitminer.model.Project;
 import aiss.gitminer.repository.ProjectRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
+@Tag(name= "Project", description= "Project management API")
 @RestController
 @RequestMapping("/api/projects")
 public class ProjectController {
-    //permiten manejar solicitudes HTTP que llegan a la aplicación
-    //implementa la funcionalidad del sistema para que un usuario externo pueda consumirlo
-    //este controller contacta con el repository para obtener la información
+    @Autowired
+    ProjectRepository projectRepository;
 
-    //iniciliazimos elrepositorio con los datos de prueba
-    private final ProjectRepository projectRepository;
+    @Operation(summary= "Retrieve project list",
+            description= "Get a list of projects ",
+            tags= { "projects", "get" })
 
-    public ProjectController(ProjectRepository projectRepository) {
-        this.projectRepository = projectRepository;
-    }
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description= "Listado de projects",
+                    content= { @Content(schema = @Schema(implementation = Project.class), mediaType= "application/json") })
+            ,@ApiResponse(responseCode = "404", description="Project no encontrado",
+            content= { @Content(schema = @Schema()) })})
 
-    //GET http://localhost:8080/gitminer/projects
+    // GET http://localhost:8080/api/projects
     @GetMapping
-    public List<Project> findAll(){
-        return projectRepository.findAll();
+    public List<Project> findAll(@RequestParam(defaultValue = "0") int page,
+                                 @RequestParam(defaultValue = "10") int size,
+                                 @RequestParam(required= false) String name,
+                                 @RequestParam(required= false) long id,
+                                 @RequestParam(required= false) String web_url,
+                                 @RequestParam(required = false) String order) {
+
+        Pageable paging;
+        Page<Project> pageProject;
+        //para cuando incluyamos el parametro order en el Postman
+        if(order!= null) {
+            if(order.startsWith("-"))//ponemos un - en el paramatro del postman tipo asi: order:-id es porque queremos ordenar de forma descendente
+                paging= PageRequest.of(page, size, Sort.by(order.substring(1)).descending());
+            else
+                paging= PageRequest.of(page, size, Sort.by(order).ascending());
+        }
+        else
+            paging= PageRequest.of(page, size);
+
+        //si queremos filtrar por el nombre del project hacemos lo del if, sino lo del else
+        if(name!= null)
+            pageProject= projectRepository.findByName(name, paging);
+        else if(id != 0)
+            pageProject= projectRepository.findByIddd(id, paging);
+        else if(web_url != null)
+            pageProject= projectRepository.findByWeb_url(web_url, paging);
+        else
+            pageProject= projectRepository.findAll(paging);
+        return pageProject.getContent();
+        // return projectRepository.findAll(); //llamamos a los metodos (ya definidos por JpaRepository)del repositorio desde el controlador
     }
 
-    //Get http://localhost:8080/gitminer/projects/{id}
+    @Operation(summary= "Retrieve project Id",
+            description= "Get project ",
+            tags= { "projects", "get" })
+
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description= "Proyecto por id",
+                    content= { @Content(schema = @Schema(implementation = Project.class), mediaType= "application/json") })
+            ,@ApiResponse(responseCode = "404", description="Project no encontrado",
+            content= { @Content(schema = @Schema()) })})
+
+    // GET http://localhost:8080/api/projects/{id}
     @GetMapping("/{id}")
-    public Project finOne(@PathVariable String id){
-        return projectRepository.findProjectById(id);
+    public Project findOne(@Parameter(description= "id of project to be searched") @PathVariable long id) throws ProjectNotFoundException {
+        // TODO: COMPLETE
+        Optional<Project> project = projectRepository.findById(id);
+        //devuelve un objeto optional (porque no tiene por qué ser necesariamente un objeto project, sino que puede ser un valor nulo o que no este presente)
+        if(!project.isPresent()){ //podemos poner el isPresent porque el findById nos devolvia un Optional, ponemos el ! para negar el booleano que nos da el metodo isPreset
+            //y asi la condicion es que si NO isPresent pues que entre en el if y devuelva la excepcion
+            throw new ProjectNotFoundException();
+        }
+        return project.get(); //para que nos devuelva el project si existe
+        // return projectRepository.findById(id).get();
     }
 
-    //POST http://localhost:8080/gitminer/projects
-    @ResponseStatus(HttpStatus.CREATED) //201=operación con éxito
-    // en los GET no hace falta ponerlo pero en los POST sí
+
+
+    @Operation(summary= "Create project",
+            description= "Create a project",
+            tags= { "projects", "post" })
+
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description= "Project creado",
+                    content= { @Content(schema = @Schema(implementation = Project.class), mediaType= "application/json") })
+            ,@ApiResponse(responseCode = "400",
+            content= { @Content(schema = @Schema()) })})
+    // POST http://localhost:8080/api/projects
     @PostMapping
-    public Project create(@Valid @RequestBody Project project){
-        return projectRepository.create(project);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Project createProject(@Valid @RequestBody Project project) {
+        Project _project = projectRepository.save(new Project(project.getId(), project.getName(), project.getWebUrl()));
+        //con save se guarda automaticamente el nuevo project que creamos con el constructor que hemos definido en la clase Project
+        return _project;
+        //return projectRepository.save(new Project(project.getName(), project.getWeb_url()));
     }
 
-    //PUT http://localhost:8080/gitminer/projects/{id}
-    @ResponseStatus(HttpStatus.NO_CONTENT) //devuelve un código 204
+    @Operation(summary= "Update project",
+            description= "Update a project",
+            tags= { "projects", "put" })
+
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", //204 significa sin contenido y se ha realizado la peticion correctamente
+                    content= { @Content(schema = @Schema()) })
+            ,@ApiResponse(responseCode = "400", //400 para cuando haya error en la peticion
+            content= { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "404", //404 para cuando no se encuentre el id
+                    content= { @Content(schema = @Schema()) })})
+    // PUT http://localhost:8080/api/projects/{id}
     @PutMapping("/{id}")
-    public void update(@Valid @RequestBody Project updatedProject, @PathVariable String id){
-        projectRepository.update(updatedProject, id);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateProject(@RequestBody @Valid Project updatedProject, @PathVariable Long id) throws ProjectNotFoundException { //aqui podriamos poner tambien la excepcion ProjectNotFoundException
+        // TODO: COMPLETE
+        Optional<Project> projectData = projectRepository.findById(id);
+
+        if(!projectData.isPresent()){
+            throw new ProjectNotFoundException();
+        }
+        Project _project = projectData.get();
+        _project.setName(updatedProject.getName());
+        _project.setCommits(updatedProject.getCommits());
+        projectRepository.save(_project);
     }
 
-    //DELETE http://localhost:8080/gitminer/projects/{id}
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary= "Delete project",
+            description= "Delete a project",
+            tags= { "projects", "delete" })
+
+    @ApiResponses({
+            @ApiResponse(responseCode = "204",
+                    content= { @Content(schema = @Schema()) })
+            ,@ApiResponse(responseCode = "400",
+            content= { @Content(schema = @Schema()) }),
+            @ApiResponse(responseCode = "404",
+                    content= { @Content(schema = @Schema()) })})
+    // DELETE http://localhost:8080/api/projects/{id}
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable String id){
-        projectRepository.delete(id);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteProject(@PathVariable Long id) {
+        // TODO: COMPLETE
+        if(projectRepository.existsById(id)){ //comprobamos que el project existe
+            projectRepository.deleteById(id);
+        }
     }
+
 }
