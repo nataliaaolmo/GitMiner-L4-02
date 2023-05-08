@@ -34,6 +34,14 @@ public class Project {
     @JoinColumn(name = "projectId")
     private List<Issue> issues;
 
+    public Project(String id, String name, String webUrl) {
+        this.id = id;
+        this.name = name;
+        this.webUrl = webUrl;
+        this.commits = new ArrayList<>();
+        this.issues = new ArrayList<>();
+    }
+
     public Project() {
         commits = new ArrayList<>();
         issues = new ArrayList<>();
