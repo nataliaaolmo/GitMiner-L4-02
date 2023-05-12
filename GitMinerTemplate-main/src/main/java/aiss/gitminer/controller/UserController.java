@@ -19,7 +19,7 @@ import java.util.Optional;
 
 @Tag(name = "User", description = "Git Users Management API")
 @RestController
-@RequestMapping("/gitminer/users")
+@RequestMapping("gitminer/users")
 public class UserController {
 
     @Autowired

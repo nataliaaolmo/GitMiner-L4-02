@@ -10,10 +10,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CommitRepository extends JpaRepository<Commit, Long> {
-    Page<Project> findById(long id, Pageable pageable);
+public interface CommitRepository extends JpaRepository<Commit, String> {
+    //Page<Project> findById(long id, Pageable pageable);
 
-    Page<Project> findByName(String name, Pageable pageable);
+    //Page<Project> findByName(String name, Pageable pageable);
 
 
 }

@@ -24,7 +24,7 @@ import java.util.Optional;
 
 @Tag(name= "Project", description= "Project management API")
 @RestController
-@RequestMapping("/api/projects")
+@RequestMapping("gitminer/projects")
 public class ProjectController {
     @Autowired
     ProjectRepository projectRepository;

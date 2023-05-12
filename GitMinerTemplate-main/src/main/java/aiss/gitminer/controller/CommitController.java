@@ -25,26 +25,30 @@ import java.util.Optional;
 
 @Tag(name= "Commit", description= "Commit management API")
 @RestController
-@RequestMapping("/api/commits")
+@RequestMapping("/gitminer/commits")
 public class CommitController {
 
-    @Autowired
-    ProjectRepository projectRepository;
+   // @Autowired
+    //ProjectRepository projectRepository;
     @Autowired
     CommitRepository commitRepository;
 
     @Operation(summary= "Retrieve commit list",
             description= "Get a list of commits ",
-            tags= { "commits", "get" })
+            tags= {"get" })
 
     @ApiResponses({
             @ApiResponse(responseCode = "200", description= "Listado de commits",content= { @Content(schema = @Schema(implementation = Commit.class), mediaType= "application/json") })
-            ,@ApiResponse(responseCode = "404", description="Commit no encontrado",content= { @Content(schema = @Schema()) })})
+           // ,@ApiResponse(responseCode = "404", description="Commit no encontrado",content= { @Content(schema = @Schema()) })
+            })
 
-    @GetMapping("/projects/{projectId}/commits")
-    public List<Commit> getAllCommitsByProjectId(@RequestParam(defaultValue = "0") int page,
+    @GetMapping() //"/projects/{projectId}/commits"
+    public List<Commit> findAll(){
+        /*
+            @RequestParam(defaultValue = "0") int page,
                                                  @RequestParam(defaultValue = "10") int size,
                                                  @RequestParam(required= false) long projectId,
+
                                                  @RequestParam(required = false) String order) {
         Pageable paging;
         Page<Project> pageProject;
@@ -60,12 +64,15 @@ public class CommitController {
         pageProject= projectRepository.findByIddd(projectId, paging);
         Project project= (Project) pageProject.get().filter(p -> p.getId().equals(projectId));
         return project.getCommits();
+
+         */
+        return commitRepository.findAll();
     }
 
 
     @Operation(summary= "Retrieve commit Id",
             description= "Get commit",
-            tags= { "commits", "get" })
+            tags= { "get" })
 
     @ApiResponses({
             @ApiResponse(responseCode = "200", description= "Commit por id",
@@ -73,8 +80,8 @@ public class CommitController {
             ,@ApiResponse(responseCode = "404", description="Commit no encontrado",
             content= { @Content(schema = @Schema()) })})
 
-    @GetMapping("/commits/{id}")
-    public Commit findOne(@Parameter(description= "id of commit to be searched") @PathVariable(value="id") Long id) throws CommitNotFoundException {
+    @GetMapping("/{id}") //"/commits/{id}"
+    public Commit findOne(@Parameter(description= "id of commit to be searched") @PathVariable(value="id") String id) throws CommitNotFoundException {
         Optional<Commit> commit = commitRepository.findById(id);
         if(!commit.isPresent()){
             throw new CommitNotFoundException();

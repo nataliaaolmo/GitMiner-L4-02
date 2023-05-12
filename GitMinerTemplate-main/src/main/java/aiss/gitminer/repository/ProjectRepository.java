@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface ProjectRepository extends JpaRepository<Project, Long> {
+public interface ProjectRepository extends JpaRepository<Project, String> {
     //obtiene el nombre por el que queremos filtrar y un objeto de la clase Pageable
-    Page<Project> findByName(String name, Pageable pageable);
+   // Page<Project> findByName(String name, Pageable pageable);
 
     //si queremos buscar no por el nombre completo, sino por un trozo de cadena que contenga el nombre usamos este metodo
-    Page<Project> findByNameContaining(String name, Pageable pageable);
+//    Page<Project> findByNameContaining(String name, Pageable pageable);
 
     //podemos poner findBy y el atributo que sea que tenga nuestra clase
 

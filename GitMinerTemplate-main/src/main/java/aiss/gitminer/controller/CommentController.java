@@ -27,33 +27,35 @@ import java.util.Optional;
 
 @Tag(name = "Comment", description = "Comment managementAPI")
 @RestController
-@RequestMapping("/gitminer")
+@RequestMapping("gitminer/comments")
 public class CommentController {
 
     @Autowired
     CommentRepository commentRepository;
 
-    @Autowired
-    IssueRepository issueRepository;
+    //@Autowired
+    //IssueRepository issueRepository;
 
-    public CommentController(CommentRepository repository) {
-        this.commentRepository = repository;
-    }
+    //public CommentController(CommentRepository repository) {
+     //   this.commentRepository = repository;
+    //}
 
     // GET http://localhost:8080/gitminer/comments
     @Operation(
             summary = "Retrieve a list of comments",
             description = "Get a list of comments",
-            tags = { "comments", "get" })
+            tags = { "get" })
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Listado de comments", content = {@Content(schema = @Schema(implementation = Comment.class), mediaType = "application/json")}),
     })
-    @GetMapping("/comments/{id}")
-    public List<Comment> findAll(@RequestParam(required = false) String author_id,
-                                 @RequestParam(required = false) String order,
-                                 @RequestParam(defaultValue = "0") int page,
-                                 @RequestParam(defaultValue = "10") int size
+    @GetMapping //("/comments/{id}")
+    public List<Comment> findAll(
+           // @RequestParam(required = false) String author_id,
+           // @RequestParam(required = false) String order,
+           // @RequestParam(defaultValue = "0") int page,
+           // @RequestParam(defaultValue = "10") int size
     ) {
+        /*
         Pageable paging;
 
         if (order != null) {
@@ -73,19 +75,22 @@ public class CommentController {
             pageProjects = commentRepository.findByAuthorID(author_id, paging);
 
         return pageProjects.getContent();
+
+         */
+        return commentRepository.findAll();
     }
 
     // GET http://localhost:8080/gitminer/comments/{id}
     @Operation(
             summary = "Retrieve a Comment by Id",
             description = "Get a Comment object by specifying its id",
-            tags = { "comments", "get" })
+            tags = {"get" })
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Comment encontrado", content = {@Content(schema = @Schema(implementation = Comment.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "404", description = "Comment no encontrado", content = {@Content(schema = @Schema())})
     })
-    @GetMapping("/comments/{id}")
-    public Comment findOne(@Parameter(description = "id of the comment to be searched") @PathVariable Long id) throws CommentNotFoundException {
+    @GetMapping("/{id}")
+    public Comment findOne(@Parameter(description = "id of the comment to be searched") @PathVariable String id) throws CommentNotFoundException {
         Optional<Comment> comment = commentRepository.findById(id);
         if (!comment.isPresent()) {
             throw new CommentNotFoundException();
@@ -93,6 +98,7 @@ public class CommentController {
         return comment.get();
     }
 
+    /*
     // GET http://localhost:8080/gitminer/issues/{id}/comments
     @Operation(
             summary = "Retrieve a Comment by the Id of an Issue",
@@ -113,5 +119,7 @@ public class CommentController {
         return comments;
 
     }
+    */
+
 
 }
