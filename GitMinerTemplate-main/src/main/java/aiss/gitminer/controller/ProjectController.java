@@ -41,13 +41,15 @@ public class ProjectController {
 
     // GET http://localhost:8080/api/projects
     @GetMapping
-    public List<Project> findAll(@RequestParam(defaultValue = "0") int page,
+    public List<Project> findAll(
+
+            /*@RequestParam(defaultValue = "0") int page,
                                  @RequestParam(defaultValue = "10") int size,
                                  @RequestParam(required= false) String name,
                                  @RequestParam(required= false) long id,
                                  @RequestParam(required= false) String web_url,
-                                 @RequestParam(required = false) String order) {
-
+                                 @RequestParam(required = false) String order*/) {
+/*
         Pageable paging;
         Page<Project> pageProject;
         //para cuando incluyamos el parametro order en el Postman
@@ -71,10 +73,14 @@ public class ProjectController {
             pageProject= projectRepository.findAll(paging);
         return pageProject.getContent();
         // return projectRepository.findAll(); //llamamos a los metodos (ya definidos por JpaRepository)del repositorio desde el controlador
+   */
+        return projectRepository.findAll();
+
+
     }
 
-    @Operation(summary= "Retrieve project Id",
-            description= "Get project ",
+    @Operation(summary= "Retrieve project by Id",
+            description= "Get project by id",
             tags= { "projects", "get" })
 
     @ApiResponses({
@@ -85,16 +91,12 @@ public class ProjectController {
 
     // GET http://localhost:8080/api/projects/{id}
     @GetMapping("/{id}")
-    public Project findOne(@Parameter(description= "id of project to be searched") @PathVariable long id) throws ProjectNotFoundException {
-        // TODO: COMPLETE
+    public Project findOne(@Parameter(description= "id of project to be searched") @PathVariable String id) throws ProjectNotFoundException {
         Optional<Project> project = projectRepository.findById(id);
-        //devuelve un objeto optional (porque no tiene por qué ser necesariamente un objeto project, sino que puede ser un valor nulo o que no este presente)
-        if(!project.isPresent()){ //podemos poner el isPresent porque el findById nos devolvia un Optional, ponemos el ! para negar el booleano que nos da el metodo isPreset
-            //y asi la condicion es que si NO isPresent pues que entre en el if y devuelva la excepcion
+        if(!project.isPresent()){
             throw new ProjectNotFoundException();
         }
-        return project.get(); //para que nos devuelva el project si existe
-        // return projectRepository.findById(id).get();
+        return project.get();
     }
 
 
@@ -112,12 +114,11 @@ public class ProjectController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Project createProject(@Valid @RequestBody Project project) {
-        Project _project = projectRepository.save(new Project(project.getId(), project.getName(), project.getWebUrl()));
-        //con save se guarda automaticamente el nuevo project que creamos con el constructor que hemos definido en la clase Project
+        Project _project = projectRepository.save(new Project(project.getId(), project.getName(), project.getWebUrl(), project.getCommits(), project.getIssues()));
         return _project;
-        //return projectRepository.save(new Project(project.getName(), project.getWeb_url()));
     }
 
+    /*
     @Operation(summary= "Update project",
             description= "Update a project",
             tags= { "projects", "put" })
@@ -133,7 +134,6 @@ public class ProjectController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateProject(@RequestBody @Valid Project updatedProject, @PathVariable Long id) throws ProjectNotFoundException { //aqui podriamos poner tambien la excepcion ProjectNotFoundException
-        // TODO: COMPLETE
         Optional<Project> projectData = projectRepository.findById(id);
 
         if(!projectData.isPresent()){
@@ -160,10 +160,9 @@ public class ProjectController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProject(@PathVariable Long id) {
-        // TODO: COMPLETE
         if(projectRepository.existsById(id)){ //comprobamos que el project existe
             projectRepository.deleteById(id);
         }
-    }
+    }*/
 
 }
