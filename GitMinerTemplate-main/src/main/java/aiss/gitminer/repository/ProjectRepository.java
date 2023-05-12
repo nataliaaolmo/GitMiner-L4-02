@@ -20,7 +20,7 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
 
     //podemos poner findBy y el atributo que sea que tenga nuestra clase
 
-    Page<Project> findByIddd(long id, Pageable pageable);
-    Page<Project> findByWeb_url(String web_url, Pageable pageable);
+ //   Page<Project> findByIddd(long id, Pageable pageable);
+ //   Page<Project> findByWeb_url(String web_url, Pageable pageable);
 }
 

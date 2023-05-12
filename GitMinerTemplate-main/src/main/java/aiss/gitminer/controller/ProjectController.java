@@ -24,7 +24,7 @@ import java.util.Optional;
 
 @Tag(name= "Project", description= "Project management API")
 @RestController
-@RequestMapping("gitminer/projects")
+@RequestMapping("/gitminer/projects")
 public class ProjectController {
     @Autowired
     ProjectRepository projectRepository;
@@ -81,7 +81,7 @@ public class ProjectController {
 
     @Operation(summary= "Retrieve project by Id",
             description= "Get project by id",
-            tags= { "projects", "get" })
+            tags= { "get" })
 
     @ApiResponses({
             @ApiResponse(responseCode = "200", description= "Proyecto por id",
@@ -103,7 +103,7 @@ public class ProjectController {
 
     @Operation(summary= "Create project",
             description= "Create a project",
-            tags= { "projects", "post" })
+            tags= { "post" })
 
     @ApiResponses({
             @ApiResponse(responseCode = "201", description= "Project creado",

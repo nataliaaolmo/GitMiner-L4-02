@@ -38,7 +38,7 @@ public class UserController {
     // GET http://localhost:8080/api/users/{id}
     // TODO: añadir la excepción
     @GetMapping("/{id}")
-    public User findOne(@Parameter(description = "id of the user to be searched") @PathVariable long id) {
+    public User findOne(@Parameter(description = "id of the user to be searched") @PathVariable String id) {
         Optional<User> user = repository.findById(id);
         return user.get();
     }
