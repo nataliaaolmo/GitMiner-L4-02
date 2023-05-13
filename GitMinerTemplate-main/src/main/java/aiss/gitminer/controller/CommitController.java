@@ -28,7 +28,7 @@ import java.util.Optional;
 @RequestMapping("/gitminer/commits")
 public class CommitController {
 
-   // @Autowired
+    // @Autowired
     //ProjectRepository projectRepository;
     @Autowired
     CommitRepository commitRepository;
@@ -39,10 +39,10 @@ public class CommitController {
 
     @ApiResponses({
             @ApiResponse(responseCode = "200", description= "Listado de commits",content= { @Content(schema = @Schema(implementation = Commit.class), mediaType= "application/json") })
-           // ,@ApiResponse(responseCode = "404", description="Commit no encontrado",content= { @Content(schema = @Schema()) })
-            })
+            // ,@ApiResponse(responseCode = "404", description="Commit no encontrado",content= { @Content(schema = @Schema()) })
+    })
 
-    @GetMapping() //"/projects/{projectId}/commits"
+    @GetMapping //"/projects/{projectId}/commits"
     public List<Commit> findAll(){
         /*
             @RequestParam(defaultValue = "0") int page,
@@ -81,12 +81,30 @@ public class CommitController {
             content= { @Content(schema = @Schema()) })})
 
     @GetMapping("/{id}") //"/commits/{id}"
-    public Commit findOne(@Parameter(description= "id of commit to be searched") @PathVariable(value="id") String id) throws CommitNotFoundException {
+    public Commit findOne(@Parameter(description= "id of commit to be searched") @PathVariable(value = "id")  String id) throws CommitNotFoundException {
         Optional<Commit> commit = commitRepository.findById(id);
         if(!commit.isPresent()){
             throw new CommitNotFoundException();
         }
         return commit.get();
+    }
+
+    @Operation(summary= "Retrieve commit by email",
+            description= "Get commit by email",
+            tags= { "get" })
+
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description= "Commit por id",
+                    content= { @Content(schema = @Schema(implementation = Commit.class), mediaType= "application/json") })
+            ,@ApiResponse(responseCode = "404", description="Commit no encontrado",
+            content= { @Content(schema = @Schema()) })})
+
+    @GetMapping("/author_email")
+    public List<Commit> findCommitByEmail(@Parameter(description = "email of the author of the commits to be searched") @RequestParam (name = "author_email") String email){
+
+        List<Commit> commits = commitRepository.findAll();
+        List<Commit> commitsByEmail = commits.stream().filter(commit -> commit.getAuthorEmail().equals(email)).toList();
+        return commitsByEmail;
     }
 
 }

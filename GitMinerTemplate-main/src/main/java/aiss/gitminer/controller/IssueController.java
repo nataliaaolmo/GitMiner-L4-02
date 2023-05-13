@@ -55,6 +55,7 @@ public class IssueController {
             @ApiResponse(responseCode = "200", description = "Listado de issues", content = { @Content(schema = @Schema(implementation = Issue.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "404", description = "No hay listado de issues", content = { @Content(schema = @Schema())})
     })
+
     @GetMapping("/{id}")
     public Issue findById(@Parameter(description = "id of the issue to be searched") @PathVariable String id) throws IssueNotFoundException {
         Optional<Issue> issue = issueRepository.findById(id);
@@ -84,6 +85,7 @@ public class IssueController {
         }
         return issue.get().getComments();
     }
+
 
     @Operation(
             summary = "Retrieve all author issues",
@@ -133,5 +135,4 @@ public class IssueController {
     }
 
      */
-
 
