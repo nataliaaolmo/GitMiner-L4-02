@@ -18,7 +18,6 @@ public class Commit {
     private String id;
     @JsonProperty("title")
     private String title;
-
     @JsonProperty("message")
     @Column(columnDefinition="TEXT")
     private String message;
@@ -41,11 +40,11 @@ public class Commit {
     private String committedDate;
 
     @JsonProperty("web_url")
-    @NotEmpty(message = "URL cannot be empty." +
-            "")
+    @NotEmpty(message = "URL cannot be empty.")
     private String webUrl;
 
-    public Commit(String id, String title, String message, String authorName, String authorEmail, String authoredDate, String committerName, String committerEmail, String committedDate, String webUrl) {
+    public Commit(String id, String title, String message, String authorName, String authorEmail, String authoredDate,
+                  String committerName, String committerEmail, String committedDate, String webUrl) {
         this.id = id;
         this.title = title;
         this.message = message;

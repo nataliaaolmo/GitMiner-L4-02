@@ -4,6 +4,7 @@ import aiss.gitminer.Exception.CommentNotFoundException;
 import aiss.gitminer.Exception.IssueNotFoundException;
 import aiss.gitminer.model.Comment;
 import aiss.gitminer.model.Issue;
+import aiss.gitminer.model.User;
 import aiss.gitminer.repository.CommentRepository;
 import aiss.gitminer.repository.IssueRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,12 +51,12 @@ public class CommentController {
     })
     @GetMapping //("/comments/{id}")
     public List<Comment> findAll(
-           // @RequestParam(required = false) String author_id,
-           // @RequestParam(required = false) String order,
-           // @RequestParam(defaultValue = "0") int page,
-           // @RequestParam(defaultValue = "10") int size
+            @RequestParam(required = false) String id,
+            @RequestParam(required = false) String body,
+            @RequestParam(required = false) String order,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
     ) {
-        /*
         Pageable paging;
 
         if (order != null) {
@@ -63,21 +64,19 @@ public class CommentController {
                 paging = PageRequest.of(page, size, Sort.by(order.substring(1)).descending());
             else
                 paging = PageRequest.of(page, size, Sort.by(order).ascending());
-        }
-        else
+        } else
             paging = PageRequest.of(page, size);
 
         Page<Comment> pageProjects;
 
-        if (author_id == null)
+        if (id == null && body == null)
             pageProjects = commentRepository.findAll(paging);
+        else if (id != null)
+            pageProjects = commentRepository.findById(id, paging);
         else
-            pageProjects = commentRepository.findByAuthorID(author_id, paging);
+            pageProjects = commentRepository.findByBody(body, paging);
 
         return pageProjects.getContent();
-
-         */
-        return commentRepository.findAll();
     }
 
     // GET http://localhost:8080/gitminer/comments/{id}

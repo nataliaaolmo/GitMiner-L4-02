@@ -17,7 +17,6 @@ public class Issue {
     @Id
     @JsonProperty("id")
     private String id;
-
     @JsonProperty("ref_id")
     private String refId;
     @JsonProperty("title")
@@ -27,7 +26,6 @@ public class Issue {
     private String description;
     @JsonProperty("state")
     private String state;
-
     @JsonProperty("created_at")
     private String createdAt;
     @JsonProperty("updated_at")
@@ -50,7 +48,6 @@ public class Issue {
     private Integer upvotes;
     @JsonProperty("downvotes")
     private Integer downvotes;
-
     @JsonProperty("web_url")
     private String webUrl;
 

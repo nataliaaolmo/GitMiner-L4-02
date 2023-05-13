@@ -1,11 +1,13 @@
 package aiss.gitminer.repository;
 
 import aiss.gitminer.model.Comment;
+import aiss.gitminer.model.Comment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CommentRepository extends JpaRepository<Comment, String> {
-   // Page<Comment> findByAuthorID(String author_id, Pageable pageable);
+    Page<Comment> findById(String id, Pageable pageable);
+    Page<Comment> findByBody(String body, Pageable pageable);
 
 }

@@ -8,11 +8,7 @@ import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 public class GitMinerApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(GitMinerApplication.class, args);
 	}
-
-
-
 }

@@ -12,15 +12,8 @@ import java.util.UUID;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, String> {
-    //obtiene el nombre por el que queremos filtrar y un objeto de la clase Pageable
-   // Page<Project> findByName(String name, Pageable pageable);
-
-    //si queremos buscar no por el nombre completo, sino por un trozo de cadena que contenga el nombre usamos este metodo
-//    Page<Project> findByNameContaining(String name, Pageable pageable);
-
-    //podemos poner findBy y el atributo que sea que tenga nuestra clase
-
- //   Page<Project> findByIddd(long id, Pageable pageable);
- //   Page<Project> findByWeb_url(String web_url, Pageable pageable);
+    Page<Project> findById(String id, Pageable pageable);
+    Page<Project> findByName(String name, Pageable pageable);
+    Page<Project> findByWebUrl(String web_url, Pageable pageable);
 }
 

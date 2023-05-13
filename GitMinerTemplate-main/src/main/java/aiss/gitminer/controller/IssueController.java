@@ -2,6 +2,7 @@ package aiss.gitminer.controller;
 
 import aiss.gitminer.Exception.IssueNotFoundException;
 import aiss.gitminer.model.Comment;
+import aiss.gitminer.model.Commit;
 import aiss.gitminer.model.Issue;
 import aiss.gitminer.repository.CommentRepository;
 import aiss.gitminer.repository.IssueRepository;
@@ -13,6 +14,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,11 +46,41 @@ public class IssueController {
             @ApiResponse(responseCode = "404", description = "No hay listado de issues", content = { @Content(schema = @Schema())})
     })
     @GetMapping()
-    public List<Issue> findAll() {
-        return issueRepository.findAll();
-    }
+    public List<Issue> findAll(
+            @RequestParam(required = false) String id,
+            @RequestParam(required = false) String refId,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String webUrl,
+            @RequestParam(required = false) String order,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable paging;
 
-    @Operation(
+        if (order != null) {
+            if (order.startsWith("-"))
+                paging = PageRequest.of(page, size, Sort.by(order.substring(1)).descending());
+            else
+                paging = PageRequest.of(page, size, Sort.by(order).ascending());
+        } else
+            paging = PageRequest.of(page, size);
+
+        Page<Issue> pageProjects;
+
+        if (id == null && refId == null && title == null && webUrl == null)
+            pageProjects = issueRepository.findAll(paging);
+        else if (id != null)
+            pageProjects = issueRepository.findById(id, paging);
+        else if (refId != null)
+            pageProjects = issueRepository.findByRefId(refId, paging);
+        else if (title != null)
+            pageProjects = issueRepository.findByTitle(title, paging);
+        else
+            pageProjects = issueRepository.findByWebUrl(webUrl, paging);
+
+        return pageProjects.getContent();
+    }
+        @Operation(
             summary = "Retrieve issues list",
             description =  "Get a list of issues",
             tags = {"get"}

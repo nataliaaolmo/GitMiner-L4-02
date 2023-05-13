@@ -1,6 +1,7 @@
 package aiss.gitminer.controller;
 
 import aiss.gitminer.Exception.CommitNotFoundException;
+import aiss.gitminer.model.Comment;
 import aiss.gitminer.model.Commit;
 import aiss.gitminer.model.Project;
 import aiss.gitminer.repository.CommitRepository;
@@ -43,32 +44,41 @@ public class CommitController {
     })
 
     @GetMapping //"/projects/{projectId}/commits"
-    public List<Commit> findAll(){
-        /*
+    public List<Commit> findAll(
+            @RequestParam(required = false) String id,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String authorName,
+            @RequestParam(required = false) String webUrl,
+            @RequestParam(required = false) String order,
             @RequestParam(defaultValue = "0") int page,
-                                                 @RequestParam(defaultValue = "10") int size,
-                                                 @RequestParam(required= false) long projectId,
-
-                                                 @RequestParam(required = false) String order) {
+            @RequestParam(defaultValue = "10") int size
+    ) {
         Pageable paging;
-        Page<Project> pageProject;
-        if(order!= null) {
-            if(order.startsWith("-"))
-                paging= PageRequest.of(page, size, Sort.by(order.substring(1)).descending());
+
+        if (order != null) {
+            if (order.startsWith("-"))
+                paging = PageRequest.of(page, size, Sort.by(order.substring(1)).descending());
             else
-                paging= PageRequest.of(page, size, Sort.by(order).ascending());
+                paging = PageRequest.of(page, size, Sort.by(order).ascending());
         }
         else
-            paging= PageRequest.of(page, size);
+            paging = PageRequest.of(page, size);
 
-        pageProject= projectRepository.findByIddd(projectId, paging);
-        Project project= (Project) pageProject.get().filter(p -> p.getId().equals(projectId));
-        return project.getCommits();
+        Page<Commit> pageProjects;
 
-         */
-        return commitRepository.findAll();
+        if (id == null && title == null && authorName == null && webUrl == null)
+            pageProjects = commitRepository.findAll(paging);
+        else if (id!=null)
+            pageProjects = commitRepository.findById(id, paging);
+        else if (title!=null)
+            pageProjects = commitRepository.findByTitle(title, paging);
+        else if (authorName!=null)
+            pageProjects = commitRepository.findByAuthorName(authorName, paging);
+        else
+            pageProjects = commitRepository.findByWebUrl(webUrl, paging);
+
+        return pageProjects.getContent();
     }
-
 
     @Operation(summary= "Retrieve commit Id",
             description= "Get commit",

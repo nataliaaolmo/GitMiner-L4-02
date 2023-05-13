@@ -1,6 +1,7 @@
 package aiss.gitminer.controller;
 
 import aiss.gitminer.Exception.ProjectNotFoundException;
+import aiss.gitminer.model.Issue;
 import aiss.gitminer.model.Project;
 import aiss.gitminer.repository.ProjectRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,39 +43,35 @@ public class ProjectController {
     // GET http://localhost:8080/api/projects
     @GetMapping
     public List<Project> findAll(
-
-            /*@RequestParam(defaultValue = "0") int page,
-                                 @RequestParam(defaultValue = "10") int size,
-                                 @RequestParam(required= false) String name,
-                                 @RequestParam(required= false) long id,
-                                 @RequestParam(required= false) String web_url,
-                                 @RequestParam(required = false) String order*/) {
-/*
+            @RequestParam(required = false) String id,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String webUrl,
+            @RequestParam(required = false) String order,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
         Pageable paging;
-        Page<Project> pageProject;
-        //para cuando incluyamos el parametro order en el Postman
-        if(order!= null) {
-            if(order.startsWith("-"))//ponemos un - en el paramatro del postman tipo asi: order:-id es porque queremos ordenar de forma descendente
-                paging= PageRequest.of(page, size, Sort.by(order.substring(1)).descending());
-            else
-                paging= PageRequest.of(page, size, Sort.by(order).ascending());
-        }
-        else
-            paging= PageRequest.of(page, size);
 
-        //si queremos filtrar por el nombre del project hacemos lo del if, sino lo del else
-        if(name!= null)
-            pageProject= projectRepository.findByName(name, paging);
-        else if(id != 0)
-            pageProject= projectRepository.findByIddd(id, paging);
-        else if(web_url != null)
-            pageProject= projectRepository.findByWeb_url(web_url, paging);
+        if (order != null) {
+            if (order.startsWith("-"))
+                paging = PageRequest.of(page, size, Sort.by(order.substring(1)).descending());
+            else
+                paging = PageRequest.of(page, size, Sort.by(order).ascending());
+        } else
+            paging = PageRequest.of(page, size);
+
+        Page<Project> pageProjects;
+
+        if (id == null && name == null && webUrl == null )
+            pageProjects = projectRepository.findAll(paging);
+        else if (id != null)
+            pageProjects = projectRepository.findById(id, paging);
+        else if (name != null)
+            pageProjects = projectRepository.findByName(name, paging);
         else
-            pageProject= projectRepository.findAll(paging);
-        return pageProject.getContent();
-        // return projectRepository.findAll(); //llamamos a los metodos (ya definidos por JpaRepository)del repositorio desde el controlador
-   */
-        return projectRepository.findAll();
+            pageProjects = projectRepository.findByWebUrl(webUrl, paging);
+
+        return pageProjects.getContent();
 
 
     }
